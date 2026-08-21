@@ -1,0 +1,48 @@
+@startuml ARCHI
+interface Instrument {
+  +getUnderlying()
+  +getStrike()
+  +getMaturity()
+}
+
+class VanillaOption implements Instrument {
+  -strike: double
+  -maturity: LocalDate
+  -isCall: boolean
+  -id: String
+  -underlying: String
+}
+
+class OptionQuoteRow {
+  -underlyingLast: double
+  -strike: double
+  -expireDate: LocalDate
+  -callIV: double
+  -putIV: double
+  -callBid: double
+  -callAsk: double
+  -putBid: double
+  -putAsk: double
+  -callVolume: double
+  -putVolume: double
+}
+
+class MarketData {
+}
+
+interface MarketDataSource {
+    +MarketData load(LocalDate date)
+}
+
+class MarketDataParquet {
+}
+
+class MarketDataAssumptions {
+}
+
+MarketDataParquet ..> OptionQuoteRow : uses
+VanillaOption ..|> Instrument
+MarketDataSource ..> MarketData : produces
+MarketData --> MarketDataAssumptions : uses
+MarketDataParquet ..|>  MarketDataSource 
+@enduml

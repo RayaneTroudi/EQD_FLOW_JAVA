@@ -1,0 +1,19 @@
+# Build Maven
+target/
+
+# Fichiers de données volumineux
+backend/data/*.parquet
+backend/data/*.csv
+backend/data/*.parquet:Zone.Identifier
+
+# IDE
+.vscode/
+*.iml
+.idea/
+
+# OS / WSL
+*:Zone.Identifier
+.DS_Store
+
+# Logs
+*.log
