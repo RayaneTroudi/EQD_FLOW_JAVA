@@ -23,7 +23,19 @@ public class MarketDataParquet implements MarketDataSource {
     public MarketData load(LocalDate date) {
         List<OptionQuoteRow> rows = new ArrayList<>();
 
-        String sql = "SELECT * FROM '" + filePath + "' WHERE QUOTE_DATE = ?";
+        String sql = "SELECT " +
+            "\"[UNDERLYING_LAST]\" AS underlying_last, " +
+            "\"[STRIKE]\" AS strike, " +
+            "\"[EXPIRE_DATE]\" AS expire_date, " +
+            "\"[C_IV]\" AS c_iv, " +
+            "\"[P_IV]\" AS p_iv, " +
+            "\"[C_BID]\" AS c_bid, " +
+            "\"[C_ASK]\" AS c_ask, " +
+            "\"[P_BID]\" AS p_bid, " +
+            "\"[P_ASK]\" AS p_ask, " +
+            "\"[C_VOLUME]\" AS c_volume, " +
+            "\"[P_VOLUME]\" AS p_volume " +
+            "FROM '" + filePath + "' WHERE \"[QUOTE_DATE]\" = ?";
 
         try (Connection conn = DriverManager.getConnection("jdbc:duckdb:");
              PreparedStatement stmt = conn.prepareStatement(sql)) {

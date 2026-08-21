@@ -9,7 +9,7 @@ public class Main {
         MarketDataAssumptions assumptions = new MarketDataAssumptions(0.003, 0.0);
 
         MarketDataParquet source = new MarketDataParquet(
-            "backend/data/spy_eod_2010.parquet",
+            "data/spy_eod_2010.parquet",
             assumptions
         );
 
