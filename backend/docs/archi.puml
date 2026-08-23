@@ -50,16 +50,17 @@ class MarketDataAssumptions {
 
 class ImpliedVolSurface {
   -points: List<VolPoint>
-  +getVol(strike: double, maturity: LocalDate): double
+  +getVol(strike: double, expireDate: LocalDate): double
   +size(): int
-
-  class VolPoint {
-    -strike: double
-    -maturity: LocalDate
-    -vol: double
-  }
 }
 
+class VolPoint <<static>> {
+  -strike: double
+  -expireDate: LocalDate
+  -vol: double
+}
+
+ImpliedVolSurface +-- VolPoint
 MarketDataParquet ..> OptionQuoteRow : uses
 VanillaOption ..|> Instrument : implements
 MarketDataSource ..> MarketData : produces
