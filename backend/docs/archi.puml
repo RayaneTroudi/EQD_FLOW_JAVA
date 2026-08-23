@@ -28,6 +28,7 @@ class OptionQuoteRow {
 }
 
 class MarketData {
+  +
 }
 
 interface MarketDataSource {
@@ -35,14 +36,23 @@ interface MarketDataSource {
 }
 
 class MarketDataParquet {
+  -filePath : String
+  -assumptions : MarketDataAssumptions
 }
 
 class MarketDataAssumptions {
+  -double : riskFreeRate
+  -double : dividendYield
 }
 
+class ImpliedSurfaceVol{
+
+}
+
+
 MarketDataParquet ..> OptionQuoteRow : uses
-VanillaOption ..|> Instrument
+VanillaOption ..|> Instrument : implements
 MarketDataSource ..> MarketData : produces
-MarketData --> MarketDataAssumptions : uses
+MarketDataAssumptions <-- MarketData  : uses
 MarketDataParquet ..|>  MarketDataSource 
 @enduml
