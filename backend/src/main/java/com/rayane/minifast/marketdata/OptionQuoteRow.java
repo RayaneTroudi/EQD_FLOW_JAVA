@@ -53,4 +53,22 @@ public class OptionQuoteRow {
     public double getPutAsk() { return putAsk; }
     public double getCallVolume() { return callVolume; }
     public double getPutVolume() { return putVolume; }
+    
+    @Override
+    public String toString() {
+        return "OptionQuoteRow{" +
+            "strike=" + strike +
+            ", expireDate=" + expireDate +
+            ", underlyingLast=" + underlyingLast +
+            ", callIV=" + callIV +
+            ", putIV=" + putIV +
+            ", callBid=" + callBid +
+            ", callAsk=" + callAsk +
+            ", putBid=" + putBid +
+            ", putAsk=" + putAsk +
+            ", callVolume=" + callVolume +
+            ", putVolume=" + putVolume +
+            '}';
+    }
+
 }

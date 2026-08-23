@@ -26,7 +26,17 @@ public class MarketDataParquet implements MarketDataSource {
         List<OptionQuoteRow> rows = readRawRows(date);
 
         // filtered all the data by choosing only the OTM Call/Put because time value is more important so more alpha for the volatility
-        List<OptionQuoteRow> filteredOTM = filte
+        List<OptionQuoteRow> filteredOTM = filteredOtmAndLiquid(rows);
+
+        // get the sport price
+        double spot = rows.get(0).getUnderlyingLast();
+
+        // compute the implied vol surface
+        ImpliedVolSurface surface = buildSurface(filteredOTM);
+
+        return new MarketData(date, spot, assumptions, null);
+
+
     }
 
 
@@ -83,6 +93,13 @@ public class MarketDataParquet implements MarketDataSource {
 
 
     private List<OptionQuoteRow> filteredOtmAndLiquid(List<OptionQuoteRow> rows){
+        List<OptionQuoteRow> result = new ArrayList<>();
+        for (OptionQuoteRow row : result) {
+            System.out.println(row.toString());
+        }
 
+        return result;
     }
+
+
 }
