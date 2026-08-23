@@ -32,9 +32,9 @@ public class MarketDataParquet implements MarketDataSource {
         double spot = rows.get(0).getUnderlyingLast();
 
         // compute the implied vol surface
-        ImpliedVolSurface surface = buildSurface(filteredOTM);
+        ImpliedVolSurface surface = new ImpliedVolSurface(filteredOTM,date);
 
-        return new MarketData(date, spot, assumptions, null);
+        return new MarketData(date, spot, assumptions, surface);
 
 
     }
@@ -88,14 +88,20 @@ public class MarketDataParquet implements MarketDataSource {
 
         System.out.println("Loaded " + rows.size() + " rows for " + date);
 
-        return null;
+        return rows;
     }
 
 
-    private List<OptionQuoteRow> filteredOtmAndLiquid(List<OptionQuoteRow> rows){
+    private List<OptionQuoteRow> filteredOtmAndLiquid(List<OptionQuoteRow> rows) {
         List<OptionQuoteRow> result = new ArrayList<>();
-        for (OptionQuoteRow row : result) {
-            System.out.println(row.toString());
+
+        for (OptionQuoteRow row : rows) {
+            boolean isOtmCall = row.getStrike() >= row.getUnderlyingLast();
+            double relevantVolume = isOtmCall ? row.getCallVolume() : row.getPutVolume();
+
+            if (relevantVolume > 0) {
+                result.add(row);
+            }
         }
 
         return result;
