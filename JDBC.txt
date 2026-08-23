@@ -1,0 +1,13 @@
+- DriverManager :
+    Non-Instanciable Object 
+    Used to find the correct driver for the correct DB , here it's DuckDB to read the .parquet
+    Returns a Connection between API JDBC and .parquet
+
+- Connection :
+    Create an instance of DuckDB in memory
+
+- PreparedStatement : 
+    conn.prepareStatement(sql) is the pre-analyse request and she will be fill by value at each ?
+    In this case the request is analysed only one time (where as at each call it's analyse using only Statement)
+    stmt.setString(1, date.toString()) fill the first occurence of '?'
+    

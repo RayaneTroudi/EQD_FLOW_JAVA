@@ -28,31 +28,42 @@ class OptionQuoteRow {
 }
 
 class MarketData {
-  +
+  -asOf: LocalDate
+  -spot: double
+  -assumptions: MarketDataAssumptions
+  -impliedVolSurface: ImpliedVolSurface
 }
 
 interface MarketDataSource {
-    +MarketData load(LocalDate date)
+  +MarketData load(LocalDate date)
 }
 
 class MarketDataParquet {
-  -filePath : String
-  -assumptions : MarketDataAssumptions
+  -filePath: String
+  -assumptions: MarketDataAssumptions
 }
 
 class MarketDataAssumptions {
-  -double : riskFreeRate
-  -double : dividendYield
+  -riskFreeRate: double
+  -dividendYield: double
 }
 
-class ImpliedSurfaceVol{
+class ImpliedVolSurface {
+  -points: List<VolPoint>
+  +getVol(strike: double, maturity: LocalDate): double
+  +size(): int
 
+  class VolPoint {
+    -strike: double
+    -maturity: LocalDate
+    -vol: double
+  }
 }
-
 
 MarketDataParquet ..> OptionQuoteRow : uses
 VanillaOption ..|> Instrument : implements
 MarketDataSource ..> MarketData : produces
-MarketDataAssumptions <-- MarketData  : uses
-MarketDataParquet ..|>  MarketDataSource 
+MarketDataAssumptions <-- MarketData : uses
+MarketDataParquet ..|> MarketDataSource : implements
+MarketData --> ImpliedVolSurface : uses
 @enduml
