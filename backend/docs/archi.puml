@@ -5,7 +5,7 @@ interface Instrument {
   +getMaturity()
 }
 
-class VanillaOption implements Instrument {
+class VanillaOption {
   -strike: double
   -maturity: LocalDate
   -isCall: boolean

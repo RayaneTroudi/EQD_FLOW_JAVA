@@ -19,8 +19,19 @@ public class MarketDataParquet implements MarketDataSource {
         this.assumptions = assumptions;
     }
 
+   
     @Override
-    public MarketData load(LocalDate date) {
+    public MarketData load(LocalDate date){
+        // read all the market data for given date
+        List<OptionQuoteRow> rows = readRawRows(date);
+
+        // filtered all the data by choosing only the OTM Call/Put because time value is more important so more alpha for the volatility
+        List<OptionQuoteRow> filteredOTM = filte
+    }
+
+
+
+    private List<OptionQuoteRow> readRawRows(LocalDate date) {
         List<OptionQuoteRow> rows = new ArrayList<>();
 
         String sql = "SELECT " +
@@ -67,8 +78,11 @@ public class MarketDataParquet implements MarketDataSource {
 
         System.out.println("Loaded " + rows.size() + " rows for " + date);
 
-        // TODO: filtrer rows (OTM + liquidité), construire ImpliedVolSurface, extraire spot
-        // return new MarketData(date, spot, assumptions, surface);
         return null;
+    }
+
+
+    private List<OptionQuoteRow> filteredOtmAndLiquid(List<OptionQuoteRow> rows){
+
     }
 }
