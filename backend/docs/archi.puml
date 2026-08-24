@@ -1,70 +1,101 @@
 @startuml ARCHI
-interface Instrument {
-  +getUnderlying()
-  +getStrike()
-  +getMaturity()
+package "instruments" {
+  interface Instrument {
+    +getUnderlying()
+    +getStrike()
+    +getMaturity()
+  }
+
+  class VanillaOption {
+    -strike: double
+    -maturity: LocalDate
+    -isCall: boolean
+    -id: String
+    -underlying: String
+  }
+
+  VanillaOption ..|> Instrument : implements
 }
 
-class VanillaOption {
-  -strike: double
-  -maturity: LocalDate
-  -isCall: boolean
-  -id: String
-  -underlying: String
+package "marketdata" {
+  class OptionQuoteRow {
+    -underlyingLast: double
+    -strike: double
+    -expireDate: LocalDate
+    -callIV: double
+    -putIV: double
+    -callBid: double
+    -callAsk: double
+    -putBid: double
+    -putAsk: double
+    -callVolume: double
+    -putVolume: double
+  }
+
+  class MarketData {
+    -asOf: LocalDate
+    -spot: double
+    -assumptions: MarketDataAssumptions
+    -impliedVolSurface: ImpliedVolSurface
+  }
+
+  interface MarketDataSource {
+    +MarketData load(LocalDate date)
+  }
+
+  class MarketDataParquet {
+    -filePath: String
+    -assumptions: MarketDataAssumptions
+  }
+
+  class MarketDataAssumptions {
+    -riskFreeRate: double
+    -dividendYield: double
+  }
+
+  MarketDataParquet ..> OptionQuoteRow : uses
+  MarketDataSource ..> MarketData : produces
+  MarketDataAssumptions <-- MarketData : uses
+  MarketDataParquet ..|> MarketDataSource : implements
 }
 
-class OptionQuoteRow {
-  -underlyingLast: double
-  -strike: double
-  -expireDate: LocalDate
-  -callIV: double
-  -putIV: double
-  -callBid: double
-  -callAsk: double
-  -putBid: double
-  -putAsk: double
-  -callVolume: double
-  -putVolume: double
+package "surface" {
+  class VolPoint {
+    -strike: double
+    -maturity: LocalDate
+    -vol: double
+    +getStrike(): double
+    +getMaturity(): LocalDate
+    +getVol(): double
+  }
+
+  interface VolInterpolator {
+    +interpolate(points: List<VolPoint>, strike: double, maturity: LocalDate): double
+  }
+
+  class NearestNeighborInterpolator {
+    +interpolate(points: List<VolPoint>, strike: double, maturity: LocalDate): double
+  }
+
+  class ImpliedVolSurface {
+    -asOf: LocalDate
+    -points: List<VolPoint>
+    -interpolator: VolInterpolator
+    +getVol(strike: double, maturity: LocalDate): double
+    +getTimeToMaturity(expireDate: LocalDate): double
+    +size(): int
+    +toCsv(): String
+    +toGrid(minStrike: double, maxStrike: double, strikeStep: double, maturitiesDays: long[]): SurfaceGrid
+    +{static} writeToFile(content: String, path: String)
+  }
+
+  ImpliedVolSurface o-- VolPoint
+  ImpliedVolSurface --> VolInterpolator : uses
+  NearestNeighborInterpolator ..|> VolInterpolator : implements
 }
 
-class MarketData {
-  -asOf: LocalDate
-  -spot: double
-  -assumptions: MarketDataAssumptions
-  -impliedVolSurface: ImpliedVolSurface
-}
-
-interface MarketDataSource {
-  +MarketData load(LocalDate date)
-}
-
-class MarketDataParquet {
-  -filePath: String
-  -assumptions: MarketDataAssumptions
-}
-
-class MarketDataAssumptions {
-  -riskFreeRate: double
-  -dividendYield: double
-}
-
-class ImpliedVolSurface {
-  -points: List<VolPoint>
-  +getVol(strike: double, expireDate: LocalDate): double
-  +size(): int
-}
-
-class VolPoint <<static>> {
-  -strike: double
-  -expireDate: LocalDate
-  -vol: double
-}
-
-ImpliedVolSurface +-- VolPoint
-MarketDataParquet ..> OptionQuoteRow : uses
-VanillaOption ..|> Instrument : implements
-MarketDataSource ..> MarketData : produces
-MarketDataAssumptions <-- MarketData : uses
-MarketDataParquet ..|> MarketDataSource : implements
 MarketData --> ImpliedVolSurface : uses
+MarketDataParquet ..> ImpliedVolSurface : builds
+MarketDataParquet ..> VolPoint : builds
+MarketDataParquet ..> NearestNeighborInterpolator : uses
 @enduml
