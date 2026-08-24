@@ -3,20 +3,31 @@ package com.rayane.minifast.surface;
 import java.time.LocalDate;
 
 public class VolPoint {
-    
-        private double strike;
-        private LocalDate expireDate; 
-        private double vol;
 
-        VolPoint(double strike, LocalDate expireDate, double vol){
-            this.strike = strike; 
-            this.expireDate = expireDate;
-            this.vol = vol;
-        }
+    private final double strike;
+    private final LocalDate maturity;
+    private final double vol;
 
-        @Override
-        public String toString(){
-            return expireDate + "," + strike + "," + vol;
-        }
-    
+    public VolPoint(double strike, LocalDate maturity, double vol) {
+        this.strike = strike;
+        this.maturity = maturity;
+        this.vol = vol;
+    }
+
+    public double getStrike() {
+        return strike;
+    }
+
+    public LocalDate getMaturity() {
+        return maturity;
+    }
+
+    public double getVol() {
+        return vol;
+    }
+
+    @Override
+    public String toString() {
+        return "VolPoint{strike=" + strike + ", maturity=" + maturity + ", vol=" + vol + "}";
+    }
 }

@@ -1,13 +1,12 @@
 package com.rayane.minifast;
 
-import com.rayane.minifast.marketdata.ImpliedVolSurface;
 import com.rayane.minifast.marketdata.MarketData;
 import com.rayane.minifast.marketdata.MarketDataAssumptions;
 import com.rayane.minifast.marketdata.MarketDataParquet;
+import com.rayane.minifast.surface.ImpliedVolSurface;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException { 

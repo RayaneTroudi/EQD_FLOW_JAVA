@@ -1,5 +1,6 @@
 package com.rayane.minifast.marketdata;
 
+import com.rayane.minifast.surface.ImpliedVolSurface;
 import java.time.LocalDate;
 
 public class MarketData {

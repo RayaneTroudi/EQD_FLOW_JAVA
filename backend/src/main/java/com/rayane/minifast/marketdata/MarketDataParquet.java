@@ -1,5 +1,8 @@
 package com.rayane.minifast.marketdata;
 
+import com.rayane.minifast.surface.ImpliedVolSurface;
+import com.rayane.minifast.surface.NearestNeighborInterpolator;
+import com.rayane.minifast.surface.VolPoint;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,27 +22,25 @@ public class MarketDataParquet implements MarketDataSource {
         this.assumptions = assumptions;
     }
 
-   
     @Override
-    public MarketData load(LocalDate date){
-        // read all the market data for given date
+    public MarketData load(LocalDate date) {
         List<OptionQuoteRow> rows = readRawRows(date);
 
-        // filtered all the data by choosing only the OTM Call/Put because time value is more important so more alpha for the volatility
         List<OptionQuoteRow> filteredOTM = filteredOtmAndLiquid(rows);
 
-        // get the sport price
         double spot = rows.get(0).getUnderlyingLast();
 
-        // compute the implied vol surface
-        ImpliedVolSurface surface = new ImpliedVolSurface(filteredOTM,date);
+        List<VolPoint> volPoints = new ArrayList<>();
+        for (OptionQuoteRow row : filteredOTM) {
+            boolean isOtmCall = row.getStrike() >= row.getUnderlyingLast();
+            double vol = isOtmCall ? row.getCallIV() : row.getPutIV();
+            volPoints.add(new VolPoint(row.getStrike(), row.getExpireDate(), vol));
+        }
+
+        ImpliedVolSurface surface = new ImpliedVolSurface(date, volPoints, new NearestNeighborInterpolator());
 
         return new MarketData(date, spot, assumptions, surface);
-
-
     }
-
-
 
     private List<OptionQuoteRow> readRawRows(LocalDate date) {
         List<OptionQuoteRow> rows = new ArrayList<>();
@@ -91,7 +92,6 @@ public class MarketDataParquet implements MarketDataSource {
         return rows;
     }
 
-
     private List<OptionQuoteRow> filteredOtmAndLiquid(List<OptionQuoteRow> rows) {
         List<OptionQuoteRow> result = new ArrayList<>();
 
@@ -106,6 +106,4 @@ public class MarketDataParquet implements MarketDataSource {
 
         return result;
     }
-
-
 }
